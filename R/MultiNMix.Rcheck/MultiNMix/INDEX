@@ -13,10 +13,10 @@ MNM_control             Generate Nimble Code for Multi-Species
                         N-Mixture (MNM) Models
 MNM_fit                 Fit a Multi-Species N-Mixture (MNM) Model in
                         Nimble
-birds                   Birds Dataset - Processed Subset of the North
-                        American Breeding Bird Survey Dataset
-birds_raw               Raw Birds Dataset - Subset of the North
-                        American Breeding Bird Survey Dataset
+birds                   Birds Dataset - Subset of the North American
+                        Breeding Bird Survey Dataset
+birds_ZI                Zero-Inflated Birds Dataset - Subset of the
+                        North American Breeding Bird Survey Dataset
 check_convergence       Convergence Check Generic Function
 check_convergence,MNM-method
                         Convergence Check for "MNM" Class

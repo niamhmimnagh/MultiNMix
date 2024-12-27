@@ -1,7 +1,7 @@
 AIC,MNM-method	AIC-MNM-method
 BIC,MNM-method	BIC-MNM-method
 birds	birds
-birds_raw	birds_raw
+birds_ZI	birds_ZI
 check_convergence	check_convergence
 check_convergence,MNM-method	check_convergence-MNM-method
 clean_envir	clean_envir

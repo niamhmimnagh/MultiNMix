@@ -97,38 +97,38 @@ Xn <- array(runif(1000), dim = c(10, 5, 2, 4))
 # Check fitted vs observed abundance
 \dontrun{plot(result@data, result@fitted_Y)}
 
-#' data(birds_raw)
+#' data(birds)
 
 # Example 2: North American Breeding Bird Data
 # Data must first be reformatted to an array of dimension (R,T,S,K)
-R <- 24
+R <- 15
 T <- 10
-S <- 20
-K <- 6
+S <- 10
+K <- 4
 # Ensure data is ordered consistently
-birds_raw <- birds_raw[order(birds_raw$Route, birds_raw$Year, birds_raw$English_Common_Name), ]
+birds <- birds[order(birds$Route, birds$Year, birds$English_Common_Name), ]
 
 # Create a 4D array with proper dimension
 Y <- array(NA, dim = c(R, T, S, K))
 
 # Map route, species, and year to indices
-route_idx <- as.numeric(factor(birds_raw$Route))
-species_idx <- as.numeric(factor(birds_raw$English_Common_Name))
-year_idx <- as.numeric(factor(birds_raw$Year))
+route_idx <- as.numeric(factor(birds$Route))
+species_idx <- as.numeric(factor(birds$English_Common_Name))
+year_idx <- as.numeric(factor(birds$Year))
 
 # Populate the array
-stop_data <- as.matrix(birds_raw[, grep("^Stop", colnames(birds_raw))])
+stop_data <- as.matrix(birds[, grep("^Stop", colnames(birds))])
 
-for (i in seq_len(nrow(birds_raw))) {
+for (i in seq_len(nrow(birds))) {
   Y[route_idx[i], , species_idx[i], year_idx[i]] <- stop_data[i, ]
   }
 
   # Assign dimnames
   dimnames(Y) <- list(
-    Route = sort(unique(birds_raw$Route)),
+    Route = sort(unique(birds$Route)),
       Stop = paste0("Stop", 1:T),
-        Species = sort(unique(birds_raw$English_Common_Name)),
-          Year = sort(unique(birds_raw$Year))
+        Species = sort(unique(birds$English_Common_Name)),
+          Year = sort(unique(birds$Year))
           )
 
 # Selecting only 5 bird species  for analysis:

@@ -22,7 +22,7 @@ LazyData: true
 URL: https://github.com/niamhmimnagh/MNM
 BugReports: https://github.com/niamhmimnagh/MNM/blob/main/.github/ISSUE_TEMPLATE/bug_report.md
 NeedsCompilation: no
-Packaged: 2024-12-26 16:23:59 UTC; niamh
+Packaged: 2024-12-27 15:33:42 UTC; niamh
 Author: Niamh Mimnagh [aut, cre],
   Rafael de Andrade Moral [aut]
 Maintainer: Niamh Mimnagh <niamhmimnagh@gmail.com>
