@@ -18,7 +18,7 @@ To install the development version of `MultiNMix`, use the following commands in
 if (!requireNamespace("devtools", quietly = TRUE)) {
   install.packages("devtools")
 
-devtools::install_github("yourusername/multinmix")
+devtools::install_github("niamhmimnagh/MultiNMix")
 ```
 
 ### Getting Started
