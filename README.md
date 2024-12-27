@@ -13,7 +13,7 @@
   
 
 ### Installation
-To install the development version of `MultinMix`, use the following commands in R:
+To install the development version of `MultiNMix`, use the following commands in R:
 ```R
 if (!requireNamespace("devtools", quietly = TRUE)) {
   install.packages("devtools")
