@@ -23,5 +23,5 @@ Suggests:
     knitr,
     rmarkdown
 LazyData: true
-URL: https://github.com/niamhmimnagh/MNM
-BugReports: https://github.com/niamhmimnagh/MNM/blob/main/.github/ISSUE_TEMPLATE/bug_report.md
+URL: https://github.com/niamhmimnagh/MultiNMix
+BugReports: https://github.com/niamhmimnagh/MultiNMix/blob/main/.github/ISSUE_TEMPLATE/bug_report.md
