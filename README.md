@@ -2,7 +2,7 @@
 # MultiNMix: A Package for Multispecies N-Mixture Models
 
 
-`MultinMix` is an R package designed for fitting Multispecies N-Mixture (MNM) Models, a powerful tool for estimating abundance and occurrence of multiple species in a hierarchical Bayesian framework.
+`MultinMix` is an R package designed for fitting Multispecies N-Mixture (MNM) Models (Mimnagh, Niamh, et al. (2022)), a powerful tool for estimating abundance and occurrence of multiple species in a hierarchical Bayesian framework.
 
 ### Features
 - **Bayesian Modeling**: Fit hierarchical Bayesian MNM models using Nimble.
@@ -157,6 +157,9 @@ density(model, param="N[1,1]") #outputs the density plot for the N[1,1] paramete
 
 ### Contributions
 Contributions are welcome! If you encounter any issues or have suggestions for improvement, please open an issue or submit a pull request on the \href{https://github.com/yourusername/multinmix}{GitHub repository}.
+
+### References
+Mimnagh, Niamh, et al. "Bayesian multi-species N-mixture models for unmarked animal communities." Environmental and Ecological Statistics 29.4 (2022): 755-778.
 
 
 
