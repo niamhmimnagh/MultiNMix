@@ -1,0 +1,35 @@
+AIC,MNM-method          AIC Method for "MNM" Class
+BIC,MNM-method          BIC Method for "MNM" Class
+MNM                     Fit a Multi-Species N-Mixture Model (MNM) using
+                        Nimble
+MNM-class               Multi-Species N-Mixture (MNM) Model Class
+MNM_AR                  Fit a Multi-Species N-Mixture Model with AR-1
+                        Using Nimble
+MNM_Hurdle              Fit a Multi-Species N-Mixture Model with Hurdle
+                        Component using Nimble
+MNM_Hurdle_AR           Fit a multi-species N-mixture (MNM) Hurdle-AR
+                        model using Nimble
+MNM_control             Generate Nimble Code for Multi-Species
+                        N-Mixture (MNM) Models
+MNM_fit                 Fit a Multi-Species N-Mixture (MNM) Model in
+                        Nimble
+birds                   Birds Dataset - Processed Subset of the North
+                        American Breeding Bird Survey Dataset
+birds_raw               Raw Birds Dataset - Subset of the North
+                        American Breeding Bird Survey Dataset
+check_convergence       Convergence Check Generic Function
+check_convergence,MNM-method
+                        Convergence Check for "MNM" Class
+clean_envir             Clean Environment of Temporary Objects
+density,MNM-method      Density Plot Method for "MNM" Class
+distribution_args       List of Valid Nimble Distributions and Their
+                        Arguments
+logLik,MNM-method       Log-Likelihood Method for "MNM" Class
+predictY                Predict Fitted Values for "MNM" Class
+simulateData            Simulate Data for Multi-Species N-Mixture
+                        Models
+tracePlot               Trace Plot Generic and Method for "MNM" Class
+validate_all_priors     Validate User-Specified Priors for Nimble
+                        Models
+validate_prior          Validate User-Specified Prior for a Single
+                        Prior
