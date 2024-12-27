@@ -156,7 +156,7 @@ density(model, param="N[1,1]") #outputs the density plot for the N[1,1] paramete
 ```
 
 ### Contributions
-Contributions are welcome! If you encounter any issues or have suggestions for improvement, please open an issue or submit a pull request on the \href{https://github.com/yourusername/multinmix}{GitHub repository}.
+Contributions are welcome! If you encounter any issues or have suggestions for improvement, please submit a report.
 
 ### References
 Mimnagh, Niamh, et al. "Bayesian multi-species N-mixture models for unmarked animal communities." Environmental and Ecological Statistics 29.4 (2022): 755-778.
