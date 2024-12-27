@@ -1,1 +1,14 @@
 .Rproj.user
+
+# Ignore R data files
+.RData
+.Rhistory
+
+# Ignore compiled binaries
+.o
+.so
+.exe
+
+# Ignore logs and temporary files
+.log
+.tmp
