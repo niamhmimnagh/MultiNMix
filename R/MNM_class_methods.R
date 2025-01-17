@@ -12,8 +12,8 @@
 #' @slot data An array containing the input data used to fit the model.
 #' @slot logLik A numeric value representing the log-likelihood of the model.
 #' @slot n_converged A numeric value indicating the number of parameters with Rhat < 1.1, showing convergence.
-#' @slot plot traceplots and density plots for all monitored variables.
-
+#' @slot plot A list containing traceplots and density plots for all monitored variables.
+#'
 #' @importFrom methods new
 #' @export
 setClass("MNM",
@@ -27,7 +27,6 @@ setClass("MNM",
            n_converged = "numeric",
            plot="list"
          ))
-
 
 #' @title Log-Likelihood Method for "MNM" Class
 #'
@@ -93,11 +92,11 @@ setMethod("BIC", "MNM", function(object) {
   -2 * logLik_val + log(n) * k
 })
 
-
 #' Convergence Check Generic Function
 #'
-#' A generic function for checking the convergence of an "MNM" object.
-#' @param object An object of class "MNM".
+#' A generic function for checking the convergence of an `"MNM"` object.
+#' @param object An object of class `"MNM"`.
+#' @return A numeric value indicating the number of parameters that meet the convergence criterion (Rhat < 1.1).
 #' @export
 setGeneric("check_convergence", function(object) standardGeneric("check_convergence"))
 
@@ -114,8 +113,6 @@ setMethod("check_convergence", "MNM", function(object) {
   object@n_converged
 })
 
-
-
 #' @title Predict Fitted Values for "MNM" Class
 #'
 #' @description
@@ -131,7 +128,6 @@ setMethod("predictY", "MNM", function(object) {
   object@fitted_Y
 })
 
-
 #' @title Density Plot Method for "MNM" Class
 #'
 #' @description
@@ -140,10 +136,10 @@ setMethod("predictY", "MNM", function(object) {
 #' @param x An object of class `"MNM"`.
 #' @param param The name of the parameter to plot (e.g., `"N[8, 1]"`).
 #' @param ... Additional arguments (not used).
-#' @return The density plot for the specified parameter is displayed.
+#' @return No return value; displays the density plot for the specified parameter.
 #' @examples
 #' # Calling the density function
-#' \dontrun{density(y, "N[10, 1]")}
+#' # density(y, "N[10, 1]")
 #'
 #' @export
 setMethod("density", "MNM", function(x, param, ...) {
@@ -168,12 +164,12 @@ setMethod("density", "MNM", function(x, param, ...) {
 #' @param x An object of class `"MNM"`.
 #' @param param The name of the parameter to plot (e.g., `"N[8, 1]"`).
 #' @param ... Additional arguments (not used for `"MNM"`).
-#' @return A trace plot for the specified parameter is displayed.
+#' @return No return value; displays a trace plot for the specified parameter.
 #' @examples
-#' \dontrun{
+#'
 #' # Assuming `y` is an object of class "MNM" with plots stored
-#' tracePlot(y, "N[8, 1]")  # Generates a trace plot for parameter N[8, 1]
-#' }
+#' # tracePlot(y, "N[8, 1]")   Generates a trace plot for parameter N[8, 1]
+#'
 #' @export
 setGeneric("tracePlot", function(x, param, ...) standardGeneric("tracePlot"))
 

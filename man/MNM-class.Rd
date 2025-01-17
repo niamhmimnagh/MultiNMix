@@ -26,6 +26,6 @@ log-likelihood, convergence diagnostics, and model summaries.
 
 \item{\code{n_converged}}{A numeric value indicating the number of parameters with Rhat < 1.1, showing convergence.}
 
-\item{\code{plot}}{traceplots and density plots for all monitored variables.}
+\item{\code{plot}}{A list containing traceplots and density plots for all monitored variables.}
 }}
 

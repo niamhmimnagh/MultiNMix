@@ -14,13 +14,13 @@
 \item{...}{Additional arguments (not used).}
 }
 \value{
-The density plot for the specified parameter is displayed.
+No return value; displays the density plot for the specified parameter.
 }
 \description{
 Generates the density plot for a specified parameter stored in the MNM object.
 }
 \examples{
 # Calling the density function
-\dontrun{density(y, "N[10, 1]")}
+# density(y, "N[10, 1]")
 
 }

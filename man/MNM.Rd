@@ -11,6 +11,7 @@ MNM(
   thin = 10,
   Xp = NULL,
   Xn = NULL,
+  verbose = TRUE,
   ...
 )
 }
@@ -45,6 +46,8 @@ See examples for implementation details.}
 \item \code{P1}: Number of abundance-related covariates
 }
 See examples for implementation details.}
+
+\item{verbose}{Control the level of output displayed during function execution. Default is TRUE.}
 
 \item{...}{Additional arguments passed for prior distribution specification. Supported distributions include dnorm, dexp, dgamma, dbeta, dunif, dlnorm, dbern, dpois, dbinom, dcat, dmnorm, dwish, dchisq, dinvgamma, dt, dweib, ddirch, dmulti, dmvt. Default prior distributions are:
 \itemize{
@@ -97,8 +100,11 @@ expanded_covariate_2 <- t(matrix(rep(covariate_2, R), nrow = S, ncol = R))
 # Combine into an array of dimensions (R, S, 2)
 Xn <- array(c(expanded_covariate_1, expanded_covariate_2), dim = c(R, S, 2))
 dim(Xn) # this is now in the correct format and can be used.
-\dontrun{result <- MNM(Y, Xn = Xn)}
-\dontrun{print(result@summary)}
+\donttest{result <- MNM(Y, Xn = Xn)}
+# nimble creates auxiliary functions that may be removed after model run is complete
+# str_objects <- ls(pattern = "^str")
+# rm(list = str_objects)
+\donttest{print(result@summary)}
 #' data(birds)
 # Example 2: North American Breeding Bird Data
 # Data must first be reformatted to an array of dimension (R,T,S,K)
@@ -128,7 +134,7 @@ for (i in seq_len(nrow(birds))) {
           )
 # Selecting only 5 bird species and 1 year for analysis:
 Y<-Y[,,1:5,1]
-\dontrun{model<-MNM_fit(Y=Y, AR=FALSE, Hurdle=FALSE, iterations=5000, burnin=1000)}
+\donttest{model<-MNM_fit(Y=Y, AR=FALSE, Hurdle=FALSE, iterations=5000, burnin=1000)}
 }
 \references{
 \itemize{

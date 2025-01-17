@@ -76,6 +76,6 @@ for (i in seq_len(nrow(birds))) {
 # Selecting only 5 bird species  for analysis:
 Y<-Y[,,1:5,]
 
-\dontrun{model<-MNM_fit(Y=Y, AR=FALSE, Hurdle=TRUE)}
+\donttest{model<-MNM_fit(Y=Y, AR=TRUE, Hurdle=TRUE)}
 }
 \keyword{datasets}

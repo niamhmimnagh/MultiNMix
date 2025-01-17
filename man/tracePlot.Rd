@@ -17,7 +17,7 @@ tracePlot(x, param, ...)
 \item{...}{Additional arguments (not used for \code{"MNM"}).}
 }
 \value{
-A trace plot for the specified parameter is displayed.
+No return value; displays a trace plot for the specified parameter.
 }
 \description{
 The \code{tracePlot} function generates trace plots for parameters in objects. This
@@ -29,8 +29,8 @@ documentation includes the generic and the method for the \code{"MNM"} class.
 
 }}
 \examples{
-\dontrun{
+
 # Assuming `y` is an object of class "MNM" with plots stored
-tracePlot(y, "N[8, 1]")  # Generates a trace plot for parameter N[8, 1]
-}
+# tracePlot(y, "N[8, 1]")   Generates a trace plot for parameter N[8, 1]
+
 }

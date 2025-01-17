@@ -35,7 +35,7 @@
 #'   - `S`: Number of species.
 #'   - `K`: Number of time points.
 #'   - `P2`: Number of abundance covariates.
-#'
+#' @param verbose Control the level of output displayed during function execution. Default is TRUE.
 #' @returns An object of class `MNM` with the following components:
 #'   - summary: Summary statistics for monitored parameters, including mean, standard deviation, standard error, quantiles, effective sample size, and Rhat values.
 #'   - n_parameters: Number of parameters in the model (useful for calculating information criteria).
@@ -44,7 +44,6 @@
 #'   - logLik: Log-likelihood of the observed data (`Y`) given the model parameters.
 #'   - n_converged: Number of parameters with successful convergence (Rhat < 1.1).
 #'   - plot: traceplots and density plots for all monitored variables.
-
 #' @examples
 #' # Example 1: Simulate data and fit the model
 #' # Simulating example data
@@ -60,9 +59,12 @@
 #' Xp <- array(runif(R * S * K * P1), dim = c(R, S, K, P1))
 #' Xn <- array(runif(R * S * K * P2), dim = c(R, S, K, P2))
 #' # Fit the MNM_Hurdle_AR model
-#' \dontrun{result <- MNM_Hurdle_AR(Y = x[["Y"]], Xp = Xp, Xn = Xn)}
+#' \donttest{result <- MNM_Hurdle_AR(Y = x[["Y"]], Xp = Xp, Xn = Xn)}
+#' # nimble creates auxiliary functions that may be removed after model run is complete
+#' # str_objects <- ls(pattern = "^str")
+#' # rm(list = str_objects)
 #' # Access results
-#' \dontrun{print(result@summary)}
+#' \donttest{print(result@summary)}
 #'
 #' #' data(birds)
 #'
@@ -101,7 +103,7 @@
 #' # Selecting only 5 bird species for analysis:
 #' Y<-Y[,,1:5,]
 #'
-#' \dontrun{model<-MNM_fit(Y=Y, AR=TRUE, Hurdle=TRUE, iterations=5000, burnin=1000)}
+#' \donttest{model<-MNM_fit(Y=Y, AR=TRUE, Hurdle=TRUE, iterations=5000, burnin=1000)}
 #'
 #' @references
 #' - Royle, J. A. (2004). N-mixture models for estimating population size from spatially replicated counts. Biometrics, 60(1), 108-115.
@@ -116,7 +118,7 @@
 #' @export
 #'
 #'
-MNM_Hurdle_AR<-function(Y=NULL,iterations=60000, burnin=20000, thin=10,  Xp=NULL, Xn=NULL, ...){
+MNM_Hurdle_AR<-function(Y=NULL,iterations=60000, burnin=20000, thin=10,  Xp=NULL, Xn=NULL, verbose=TRUE, ...){
   if(is.null(Y)){
     stop("Error: No data entered. Please provide Y: an array of dimension (R,T,S,K).")
   }
@@ -138,104 +140,127 @@ MNM_Hurdle_AR<-function(Y=NULL,iterations=60000, burnin=20000, thin=10,  Xp=NULL
     print(paste0("Warning: Using too few iterations may result in a model that fails to converge."))
   }
 
-  # Retrieve model code
-  code=MNM_control(model="HurdleAR", Xp=Xp, Xn=Xn, ...)
-  nimble::nimbleOptions(showCompilerOutput = FALSE, verboseErrors = FALSE, verbose=FALSE, clearNimbleFunctionsAfterCompiling=TRUE, clearCompiled=TRUE)
-  model_code <- eval(parse(text = code))
+
+  # Capture additional arguments
+  additional_args <- list(...)
 
 
-  # Dynamically construct the data list and initial values list, and ensure correct dimensionality of Xp and Xn, if present
-  data_list <- list(Y = Y,
-                    Omega = base::diag(S))
+    # Retrieve model code
+    code <- do.call(MNM_control, c(list(model = "HurdleAR", Xp = Xp, Xn = Xn), additional_args))
+    nimble::nimbleOptions(showCompilerOutput = FALSE, verboseErrors = FALSE, verbose=FALSE, clearNimbleFunctionsAfterCompiling=TRUE, clearCompiled=TRUE)
+    model_code <- eval(parse(text = code))
 
-  inits_list <- list(theta = 0.5,  # Initial value for the hurdle probability
-                    gamma = rep(0, S),  # Detection logit
-                    a = matrix(0, R, S),  # Random effects
-                    z = apply(Y, c(1,3,4),function(z) ifelse(any(z)>0, 1, 0)),  # Structural zeros indicator
-                    count = apply(Y, c(1,3,4), max)+1,  # Initial count values
-                    mu = rep(0, S),
-                    precision = base::diag(S) * (S+1),
-                    phi = stats::rnorm(S, mean = 0, sd = 0.1), # Small random deviations from 0
-                    muPhi = stats::rnorm(1, mean = 0, sd = 0.1), # Small deviation from 0
-                    sdPhi = stats::runif(1, 0.1, 2))
-  constants_list<-list(S = S, R = R, T = T, K=K, df = S+1)
+    if(verbose==TRUE){
+      print("Building model ...")
+    }
 
-
-  if(!is.null(Xp) & length(dim(Xp))==length(dim(Y))){
-    dim_Xp<-dim(Xp)[length(dim(Y))]
-    data_list$Xp <- Xp
-    inits_list$beta_p <- matrix(0, nrow = dim_Xp, ncol = S)
-    constants_list$dim_Xp<-dim_Xp
-  }
-  else if(!is.null(Xp) & length(dim(Xp!=length(dim(Y))))){
-    stop("Model building stopped: Xp should be an array of dimension (R,S,P) where P is the number of probability-level covariates")
-  }
-  else{
-    dim_Xp<-0
-  }
-
-  if(!is.null(Xn) & length(dim(Xn))==length(dim(Y))){
-    dim_Xn<-dim(Xn)[length(dim(Y))]
-    data_list$Xn <- Xn  # Include Xn only if it is not NULL
-    inits_list$beta_n <- matrix(0, nrow = dim_Xn, ncol = S)
-    constants_list$dim_Xn<-dim_Xn
-  }
-  else if(!is.null(Xn) & length(dim(Xn!=length(dim(Y))))){
-    stop("Model building stopped: Xn should be an array of dimension (R,S,P) where P is the number of abundance-level covariates")
-  }
-  else{
-    dim_Xn<-0
-  }
+    # Dynamically construct the data list and initial values list, and ensure correct dimensionality of Xp and Xn, if present
+    data_list <- list(Y = Y, Omega = base::diag(S))
+    inits_list <- list(theta = 0.5,  # Initial value for the hurdle probability
+                       gamma = rep(0, S),  # Detection logit
+                       a = matrix(0, R, S),  # Random effects
+                       z = apply(Y, c(1,3,4),function(z) ifelse(any(z)>0, 1, 0)),  # Structural zeros indicator
+                       count = apply(Y, c(1,3,4), max)+1,  # Initial count values
+                       mu = rep(0, S),
+                       precision = base::diag(S) * (S+1),
+                       phi = stats::rnorm(S, mean = 0, sd = 0.1), # Small random deviations from 0
+                       muPhi = stats::rnorm(1, mean = 0, sd = 0.1), # Small deviation from 0
+                       sdPhi = stats::runif(1, 0.1, 2))
+    constants_list<-list(S = S, R = R, T = T, K=K, df = S+1)
 
 
-  # Define the Nimble model in the new environment
-  print("Building model ...")
-  nimbleModel <- nimble::nimbleModel(code=model_code,
-                                     data=data_list,
-                                     constants=constants_list,
-                                     inits <- inits_list,
-                                     check=FALSE,
-                                     calculate=FALSE)
+    if(!is.null(Xp) & length(dim(Xp))==length(dim(Y))){
+      dim_Xp<-dim(Xp)[length(dim(Y))]
+      data_list$Xp <- Xp
+      inits_list$beta_p <- matrix(0, nrow = dim_Xp, ncol = S)
+      constants_list$dim_Xp<-dim_Xp
+    } else if(!is.null(Xp) & length(dim(Xp!=length(dim(Y))))){
+      stop("Model building stopped: Xp should be an array of dimension (R,S,P) where P is the number of probability-level covariates")
+    } else{
+      dim_Xp<-0
+    }
 
-  # Configure and build the MCMC in the environment
-  print("Building MCMC object ... ")
-  mcmcConf <- nimble::configureMCMC(nimbleModel)
-
-  mcmcConf$addMonitors(c("mu", "cor", "covariance", "N", "sigma", "probability", "Y_pred", "theta", "gamma"))
-  if (dim_Xp > 0) {
-    mcmcConf$addMonitors(c("beta_p"))
-  }
-  if (dim_Xn > 0) {
-    mcmcConf$addMonitors(c("beta_n"))
-  }
-  mcmc <- nimble::buildMCMC(mcmcConf)
-
-  # Compile the model and MCMC objects within the environment
-  print("Compiling model ... ")
-  compiledModel <- nimble::compileNimble(nimbleModel)
-  print("Compiling MCMC object ... ")
-  compiledMCMC <- nimble::compileNimble(mcmc, project=nimbleModel)
+    if(!is.null(Xn) & length(dim(Xn))==length(dim(Y))){
+      dim_Xn<-dim(Xn)[length(dim(Y))]
+      data_list$Xn <- Xn  # Include Xn only if it is not NULL
+      inits_list$beta_n <- matrix(0, nrow = dim_Xn, ncol = S)
+      constants_list$dim_Xn<-dim_Xn
+    } else if(!is.null(Xn) & length(dim(Xn!=length(dim(Y))))){
+      stop("Model building stopped: Xn should be an array of dimension (R,S,P) where P is the number of abundance-level covariates")
+    } else{
+      dim_Xn<-0
+    }
 
 
-  # Run the MCMC within the environment
-  print("Running MCMC object ... ")
-  results <- nimble::runMCMC(compiledMCMC,
-                              niter=iterations,
-                              nburnin=burnin,
-                              thin=thin,
-                              nchains=4)
+    # Define the Nimble model
+    nimbleModel <- nimble::nimbleModel(code=model_code,
+                                       data=data_list,
+                                       constants=constants_list,
+                                       inits=inits_list,
+                                       check=FALSE,
+                                       calculate=FALSE)
+
+    # Configure and build the MCMC in the environment
+    if(verbose==TRUE){
+          print("Building MCMC object ... ")
+    }
+    mcmcConf <- nimble::configureMCMC(nimbleModel)
+
+    # Dynamically building the list of parameters to monitor
+    mcmcConf$addMonitors(c("mu", "correlation", "covariance", "N", "sigma", "probability", "Y_pred", "a","gamma", "precision" ))
+    if (dim_Xp > 0) {
+      mcmcConf$addMonitors(c("beta_p"))
+    }
+    if (dim_Xn > 0) {
+      mcmcConf$addMonitors(c("beta_n"))
+    }
+    mcmc <- nimble::buildMCMC(mcmcConf)
+
+    # Compile the model and MCMC objects:
+    if(verbose==TRUE){
+         print("Compiling model ... ")
+    }
+    compiledModel <- nimble::compileNimble(nimbleModel)
+    if(verbose==TRUE){
+         print("Compiling MCMC object ... ")
+    }
+    compiledMCMC <- nimble::compileNimble(mcmc, project=nimbleModel)
+
+
+    # Run the MCMC
+    if(verbose==TRUE){
+         print("Running MCMC object ... ")
+    }
+    results <- nimble::runMCMC(compiledMCMC,
+                               niter=iterations,
+                               nburnin=burnin,
+                               thin=thin,
+                               nchains=4)
+
+
+
+
   # extract parameter estimates for monitored parameters
   all_samples <- do.call(rbind, results)
   extract_parameter <- function(results, param_name, dim = NULL) {
     all_samples <- do.call(rbind, results)
     param_columns <- grep(paste0("^", param_name), colnames(all_samples))
-    param_means <- colMeans(all_samples[, param_columns])
+
+    if (length(param_columns) == 0) {
+      warning(paste("No columns found for parameter:", param_name))
+      return(NULL)
+    }
+
+    # Ensure the input to colMeans has at least two dimensions
+    param_data <- all_samples[, param_columns, drop = FALSE]
+    param_means <- colMeans(param_data)
 
     if (!is.null(dim)) {
       return(array(param_means, dim = dim))
     }
     return(param_means)
   }
+
 
   monitored_params <- unique(sub("\\[.*", "", colnames(all_samples)))
   param_means_list <- lapply(monitored_params, function(param) {

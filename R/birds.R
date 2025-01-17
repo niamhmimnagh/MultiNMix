@@ -58,7 +58,7 @@
 #' # Selecting only 5 bird species and 1 year for analysis:
 #' Y<-Y[,,1:5,1]
 #'
-#' \dontrun{model<-MNM_fit(Y=Y, AR=FALSE, Hurdle=FALSE)}
+#' \donttest{model<-MNM_fit(Y=Y, AR=FALSE, Hurdle=FALSE)}
 #'
 "birds"
 
@@ -129,7 +129,7 @@
 #' # Selecting only 5 bird species  for analysis:
 #' Y<-Y[,,1:5,]
 #'
-#' \dontrun{model<-MNM_fit(Y=Y, AR=FALSE, Hurdle=TRUE)}
+#' \donttest{model<-MNM_fit(Y=Y, AR=TRUE, Hurdle=TRUE)}
 
 "birds_ZI"
 

@@ -4,7 +4,15 @@
 \alias{MNM_fit}
 \title{Fit a Multi-Species N-Mixture (MNM) Model in Nimble}
 \usage{
-MNM_fit(Y = NULL, AR = FALSE, Hurdle = FALSE, Xp = NULL, Xn = NULL, ...)
+MNM_fit(
+  Y = NULL,
+  AR = FALSE,
+  Hurdle = FALSE,
+  Xp = NULL,
+  Xn = NULL,
+  verbose = TRUE,
+  ...
+)
 }
 \arguments{
 \item{Y}{Array of observed count data:
@@ -31,10 +39,12 @@ See examples for implementation details.
 
 \item{Xn}{An array of covariates affecting abundance, with dimensions (R, S, P2), where:
 \itemize{
-\item \code{R}: Number of sites
-\item \code{S}: Number of species
-\item \code{P2}: Number of abundance-related covariates
+\item \code{R}: Number of sites.
+\item \code{S}: Number of species.
+\item \code{P2}: Number of abundance-related covariates.
 }}
+
+\item{verbose}{Control the level of output displayed during function execution. Default is TRUE.}
 
 \item{...}{Additional arguments for prior distributions. Supported priors include:
 \itemize{
@@ -70,25 +80,28 @@ Y <- array(data = rpois(60, lambda = 5), dim = c(3, 5, 4))  # Simulated counts
 Xp <- array(data = rnorm(60), dim = c(3, 4, 2))  # Detection covariates
 Xn <- array(data = rnorm(60), dim = c(3, 4, 2))  # Abundance covariates
 
-\dontrun{model <- MNM_fit(Y = Y, AR = FALSE, Hurdle = FALSE, Xp = Xp, Xn = Xn)}
+\donttest{model <- MNM_fit(Y = Y, AR = FALSE, Hurdle = FALSE, Xp = Xp, Xn = Xn)}
+# nimble creates auxiliary functions that may be removed after model run is complete
+# str_objects <- ls(pattern = "^str")
+# rm(list = str_objects)
 
 #' # Example 2: Fit an MNM model with AR-1 component
 Y <- array(data = rpois(180, lambda = 5), dim = c(3, 5, 4, 3))  # Simulated counts
 Xp <- array(data = rnorm(180), dim = c(3, 4, 3, 2))  # Detection covariates
 Xn <- array(data = rnorm(180), dim = c(3, 4, 3, 2))  # Abundance covariates
 
-\dontrun{model <- MNM_fit(Y = Y, AR = TRUE, Hurdle = FALSE, Xp = Xp, Xn = Xn)}
+\donttest{model <- MNM_fit(Y = Y, AR = TRUE, Hurdle = FALSE, Xp = Xp, Xn = Xn)}
 
 # Example 3: Fit an MNM model with user-specified prior distributions
 Y <- array(data = rpois(60, lambda = 5), dim = c(3, 5, 4))  # Simulated counts
 Xp <- array(data = rnorm(60), dim = c(3, 4, 2))  # Detection covariates
 Xn <- array(data = rnorm(60), dim = c(3, 4, 2))  # Abundance covariates
 
-\dontrun{model <- MNM_fit(Y = Y, AR = FALSE, Hurdle = TRUE, Xp = Xp, Xn = Xn,
+\donttest{model <- MNM_fit(Y = Y, AR = FALSE, Hurdle = TRUE, Xp = Xp, Xn = Xn,
                           prior_detection_probability="dnorm(0.01,0.01)")}
 # Access traceplots and density plots
-\dontrun{tracePlot(y, "N[10, 1]")}
-\dontrun{density(y, "N[10, 1]")}
+\donttest{tracePlot(model, "N[3, 1]")}
+\donttest{density(model, "N[3, 1]")}
 
 }
 \references{

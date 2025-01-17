@@ -23,10 +23,10 @@
 #'   - `P1`: Number of detection-related covariates
 #'   See examples for implementation details.
 #' @param Xn An array of covariates affecting abundance, with dimensions (R, S, P2), where:
-#'   - `R`: Number of sites
-#'   - `S`: Number of species
-#'   - `P2`: Number of abundance-related covariates
-#'
+#'   - `R`: Number of sites.
+#'   - `S`: Number of species.
+#'   - `P2`: Number of abundance-related covariates.
+#' @param verbose Control the level of output displayed during function execution. Default is TRUE.
 #' @returns An MNM object that contains the following components:
 #'   - summary: Nimble model summary (mean, standard deviation, standard error, quantiles, effective sample size and Rhat value for all monitored values)
 #'   - n_parameters: Number of parameters in the model (for use in calculating information criteria)
@@ -51,48 +51,51 @@
 #' Xp <- array(data = rnorm(60), dim = c(3, 4, 2))  # Detection covariates
 #' Xn <- array(data = rnorm(60), dim = c(3, 4, 2))  # Abundance covariates
 #'
-#' \dontrun{model <- MNM_fit(Y = Y, AR = FALSE, Hurdle = FALSE, Xp = Xp, Xn = Xn)}
+#' \donttest{model <- MNM_fit(Y = Y, AR = FALSE, Hurdle = FALSE, Xp = Xp, Xn = Xn)}
+#' # nimble creates auxiliary functions that may be removed after model run is complete
+#' # str_objects <- ls(pattern = "^str")
+#' # rm(list = str_objects)
 #'
 #' #' # Example 2: Fit an MNM model with AR-1 component
 #' Y <- array(data = rpois(180, lambda = 5), dim = c(3, 5, 4, 3))  # Simulated counts
 #' Xp <- array(data = rnorm(180), dim = c(3, 4, 3, 2))  # Detection covariates
 #' Xn <- array(data = rnorm(180), dim = c(3, 4, 3, 2))  # Abundance covariates
 #'
-#' \dontrun{model <- MNM_fit(Y = Y, AR = TRUE, Hurdle = FALSE, Xp = Xp, Xn = Xn)}
+#' \donttest{model <- MNM_fit(Y = Y, AR = TRUE, Hurdle = FALSE, Xp = Xp, Xn = Xn)}
 #'
 #' # Example 3: Fit an MNM model with user-specified prior distributions
 #' Y <- array(data = rpois(60, lambda = 5), dim = c(3, 5, 4))  # Simulated counts
 #' Xp <- array(data = rnorm(60), dim = c(3, 4, 2))  # Detection covariates
 #' Xn <- array(data = rnorm(60), dim = c(3, 4, 2))  # Abundance covariates
 #'
-#' \dontrun{model <- MNM_fit(Y = Y, AR = FALSE, Hurdle = TRUE, Xp = Xp, Xn = Xn,
+#' \donttest{model <- MNM_fit(Y = Y, AR = FALSE, Hurdle = TRUE, Xp = Xp, Xn = Xn,
 #'                           prior_detection_probability="dnorm(0.01,0.01)")}
 #' # Access traceplots and density plots
-#' \dontrun{tracePlot(y, "N[10, 1]")}
-#' \dontrun{density(y, "N[10, 1]")}
+#' \donttest{tracePlot(model, "N[3, 1]")}
+#' \donttest{density(model, "N[3, 1]")}
 #'
 #' @export
-MNM_fit<-function(Y=NULL, AR=FALSE, Hurdle=FALSE, Xp=NULL, Xn=NULL, ...){
+MNM_fit<-function(Y=NULL, AR=FALSE, Hurdle=FALSE, Xp=NULL, Xn=NULL, verbose=TRUE, ...){
 
   if(AR==TRUE & Hurdle==TRUE){
     if(!is.array(Y)|!length(dim(Y))==4){
       stop("Observations Y must be an array with dimensions R,T,S,K")
     }
-    mnm_object<-MNM_Hurdle_AR(Y, Xp=Xp, Xn=Xn,...)
+    mnm_object<-MNM_Hurdle_AR(Y, Xp=Xp, Xn=Xn, verbose=verbose,...)
 
   }
   else if(AR==TRUE & Hurdle==FALSE){
     if(!is.array(Y)|!length(dim(Y))==4){
       stop("Observations Y must be an array with dimensions R,T,S,K")
     }
-    mnm_object<-MNM_AR(Y, Xp=Xp, Xn=Xn, ...)
+    mnm_object<-MNM_AR(Y, Xp=Xp, Xn=Xn, verbose=verbose, ...)
 
   }
   else if(AR==FALSE & Hurdle==TRUE){
     if(!is.array(Y)|!length(dim(Y))==3){
       stop("Observations Y must be an array with dimensions R,T,S")
     }
-    mnm_object<-MNM_Hurdle(Y, Xp=Xp, Xn=Xn, ...)
+    mnm_object<-MNM_Hurdle(Y, Xp=Xp, Xn=Xn, verbose=verbose,...)
 
   }
   else{
@@ -100,11 +103,11 @@ MNM_fit<-function(Y=NULL, AR=FALSE, Hurdle=FALSE, Xp=NULL, Xn=NULL, ...){
       stop("Observations Y must be an array with dimensions R,T,S")
     }
 
-    mnm_object <- MNM(Y, Xp=Xp, Xn=Xn, ...)  # Call MNM to get the result
+    mnm_object <- MNM(Y, Xp=Xp, Xn=Xn, verbose=verbose,...)  # Call MNM to get the result
     }
 
   # Run cleanup after MNM completes
-  clean_envir(env_rm = .GlobalEnv)
+  #clean_envir(env_rm = .GlobalEnv)
   # Return the MNM object
   return(mnm_object)
 }
