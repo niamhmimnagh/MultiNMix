@@ -7,8 +7,11 @@
 check_convergence(object)
 }
 \arguments{
-\item{object}{An object of class "MNM".}
+\item{object}{An object of class \code{"MNM"}.}
+}
+\value{
+A numeric value indicating the number of parameters that meet the convergence criterion (Rhat < 1.1).
 }
 \description{
-A generic function for checking the convergence of an "MNM" object.
+A generic function for checking the convergence of an \code{"MNM"} object.
 }

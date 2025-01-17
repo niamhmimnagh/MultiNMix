@@ -38,7 +38,7 @@
 #'   - `S`: Number of species.
 #'   - `K`: Number of time points.
 #'   - `P2`: Number of abundance covariates.
-#'
+#' @param verbose Control the level of output displayed during function execution. Default is TRUE.
 #' @returns An MNM object that contains the following components:
 #'   - summary: Nimble model summary (mean, standard deviation, standard error, quantiles, effective sample size and Rhat value for all monitored values).
 #'   - n_parameters: Number of parameters in the model (for use in calculating information criteria).
@@ -63,10 +63,12 @@
 #' Xn <- array(runif(1000), dim = c(10, 5, 2, 4))
 #'
 #' # Fit the AR-1 model
-#' \dontrun{result <- MNM_AR(Y = Y, Xp = Xp, Xn = Xn)}
-#'
+#' \donttest{result <- MNM_AR(Y = Y, Xp = Xp, Xn = Xn)}
+#' # nimble creates auxiliary functions that may be removed after model run is complete
+#' # str_objects <- ls(pattern = "^str")
+#' # rm(list = str_objects)
 #' # Check fitted vs observed abundance
-#' \dontrun{plot(result@data, result@fitted_Y)}
+#' \donttest{plot(result@data, result@fitted_Y)}
 #'
 #' #' data(birds)
 #'
@@ -105,7 +107,7 @@
 #' # Selecting only 5 bird species  for analysis:
 #' Y<-Y[,,1:5,]
 #'
-#'\dontrun{model<-MNM_fit(Y=Y, AR=TRUE, Hurdle=FALSE, iterations=10000, burnin=2000)}
+#'\donttest{model<-MNM_fit(Y=Y, AR=TRUE, Hurdle=FALSE, iterations=10000, burnin=2000)}
 #'
 #' @import abind
 #' @export
@@ -113,7 +115,7 @@
 #'
 #'
 #'
-MNM_AR<-function(Y=NULL,iterations=60000, burnin=20000, thin=10, Xp=NULL, Xn=NULL, ...){
+MNM_AR<-function(Y=NULL,iterations=60000, burnin=20000, thin=10, Xp=NULL, Xn=NULL, verbose=TRUE, ...){
 if(is.null(Y)){
   stop("Error: No data entered. Please provide Y: an array of dimension (R,T,S,K).")
 }
@@ -135,54 +137,56 @@ if(iterations<5000){
   print(paste0("Warning: Using too few iterations may result in a model that fails to converge."))
 }
 
-# Retrieve model code
-code=MNM_control(model="AR", Xp=Xp, Xn=Xn, ...)
-nimble::nimbleOptions(showCompilerOutput = FALSE, verboseErrors = FALSE, verbose=FALSE, clearNimbleFunctionsAfterCompiling=TRUE, clearCompiled=TRUE)
-model_code <- eval(parse(text = code))
 
-# Dynamically construct the data, constants and initial values lists
-data_list <- list(Y = Y,
-                  Omega = base::diag(S))
-
-inits_list <- list(N = apply(Y, c(1,3,4), max)+1,
-                   mu = rep(0, S),
-                   gamma = rep(0, S),
-                   precision = base::diag(S) * (S+1),
-                   phi = stats::rnorm(S, mean = 0, sd = 0.1),
-                   muPhi = stats::rnorm(1, mean = 0, sd = 0.1),
-                   sdPhi = stats::runif(1, 0.1, 2))
-constants_list<-list(S = S, R = R, T = T, K=K, df = S+1)
+# Capture additional arguments
+additional_args <- list(...)
 
 
-if(!is.null(Xp) & length(dim(Xp))==length(dim(Y))){
-  dim_Xp<-dim(Xp)[length(dim(Y))]
-  data_list$Xp <- Xp
-  inits_list$beta_p <- matrix(0, nrow = dim_Xp, ncol = S)
-  constants_list$dim_Xp<-dim_Xp
-}
-else if(!is.null(Xp) & length(dim(Xp!=length(dim(Y))))){
-  stop("Model building stopped: Xp should be an array of dimension (R,S,P) where P is the number of probability-level covariates")
-}
-else{
-  dim_Xp<-0
-}
+  # Retrieve model code
+  code <- do.call(MNM_control, c(list(model = "AR", Xp = Xp, Xn = Xn), additional_args))
+  nimble::nimbleOptions(showCompilerOutput = FALSE, verboseErrors = FALSE, verbose=FALSE, clearNimbleFunctionsAfterCompiling=TRUE, clearCompiled=TRUE)
+  model_code <- eval(parse(text = code))
 
-if(!is.null(Xn) & length(dim(Xn))==length(dim(Y))){
-  dim_Xn<-dim(Xn)[length(dim(Y))]
-  data_list$Xn <- Xn  # Include Xn only if it is not NULL
-  inits_list$beta_n <- matrix(0, nrow = dim_Xn, ncol = S)
-  constants_list$dim_Xn<-dim_Xn
-}
-else if(!is.null(Xn) & length(dim(Xn!=length(dim(Y))))){
-  stop("Model building stopped: Xn should be an array of dimension (R,S,P) where P is the number of abundance-level covariates")
-}
-else{
-  dim_Xn<-0
-}
+  if(verbose==TRUE){
+    print("Building model ...")
+  }
+
+  # Dynamically construct the data list and initial values list, and ensure correct dimensionality of Xp and Xn, if present
+  data_list <- list(Y = Y, Omega = base::diag(S))
+  inits_list <- list(N = apply(Y, c(1,3,4), max)+1,
+                     mu = rep(0, S),
+                     gamma = rep(0, S),
+                     precision = base::diag(S) * (S+1),
+                     phi = stats::rnorm(S, mean = 0, sd = 0.1),
+                     muPhi = stats::rnorm(1, mean = 0, sd = 0.1),
+                     sdPhi = stats::runif(1, 0.1, 2))
+  constants_list<-list(S = S, R = R, T = T, K=K, df = S+1)
 
 
-  # Define the Nimble model in the new environment
-  print("Building model ...")
+  if(!is.null(Xp) & length(dim(Xp))==length(dim(Y))){
+    dim_Xp<-dim(Xp)[length(dim(Y))]
+    data_list$Xp <- Xp
+    inits_list$beta_p <- matrix(0, nrow = dim_Xp, ncol = S)
+    constants_list$dim_Xp<-dim_Xp
+  } else if(!is.null(Xp) & length(dim(Xp!=length(dim(Y))))){
+    stop("Model building stopped: Xp should be an array of dimension (R,S,P) where P is the number of probability-level covariates")
+  } else{
+    dim_Xp<-0
+  }
+
+  if(!is.null(Xn) & length(dim(Xn))==length(dim(Y))){
+    dim_Xn<-dim(Xn)[length(dim(Y))]
+    data_list$Xn <- Xn  # Include Xn only if it is not NULL
+    inits_list$beta_n <- matrix(0, nrow = dim_Xn, ncol = S)
+    constants_list$dim_Xn<-dim_Xn
+  } else if(!is.null(Xn) & length(dim(Xn!=length(dim(Y))))){
+    stop("Model building stopped: Xn should be an array of dimension (R,S,P) where P is the number of abundance-level covariates")
+  } else{
+    dim_Xn<-0
+  }
+
+
+  # Define the Nimble model
   nimbleModel <- nimble::nimbleModel(code=model_code,
                                      data=data_list,
                                      constants=constants_list,
@@ -191,10 +195,14 @@ else{
                                      calculate=FALSE)
 
   # Configure and build the MCMC in the environment
-  print("Building MCMC object ... ")
+  if(verbose==TRUE){
+      print("Building MCMC object ... ")
+
+  }
   mcmcConf <- nimble::configureMCMC(nimbleModel)
 
-  mcmcConf$addMonitors(c("mu", "cor", "covariance", "N", "sigma", "probability", "Y_pred"))
+  # Dynamically building the list of parameters to monitor
+  mcmcConf$addMonitors(c("mu", "correlation", "covariance", "N", "sigma", "probability", "Y_pred", "a","gamma", "precision" ))
   if (dim_Xp > 0) {
     mcmcConf$addMonitors(c("beta_p"))
   }
@@ -203,29 +211,51 @@ else{
   }
   mcmc <- nimble::buildMCMC(mcmcConf)
 
-  # Compile the model and MCMC objects within the environment
-  print("Compiling model ... ")
+  # Compile the model and MCMC objects:
+  if(verbose==TRUE){
+      print("Compiling model ... ")
+  }
   compiledModel <- nimble::compileNimble(nimbleModel)
-  print("Compiling MCMC object ... ")
+  if(verbose==TRUE){
+      print("Compiling MCMC object ... ")
+  }
   compiledMCMC <- nimble::compileNimble(mcmc, project=nimbleModel)
 
 
-  # Run the MCMC within the environment
-  print("Running MCMC object ... ")
-  results <- nimble::runMCMC(compiledMCMC, niter=iterations, nburnin=burnin, thin=thin, nchains=4)
+  # Run the MCMC
+  if(verbose==TRUE){
+      print("Running MCMC object ... ")
+  }
+  results <- nimble::runMCMC(compiledMCMC,
+                             niter=iterations,
+                             nburnin=burnin,
+                             thin=thin,
+                             nchains=4)
+
+
+
 
   # extract parameter estimates for monitored parameters
   all_samples <- do.call(rbind, results)
   extract_parameter <- function(results, param_name, dim = NULL) {
     all_samples <- do.call(rbind, results)
     param_columns <- grep(paste0("^", param_name), colnames(all_samples))
-    param_means <- colMeans(all_samples[, param_columns])
+
+    if (length(param_columns) == 0) {
+      warning(paste("No columns found for parameter:", param_name))
+      return(NULL)
+    }
+
+    # Ensure the input to colMeans has at least two dimensions
+    param_data <- all_samples[, param_columns, drop = FALSE]
+    param_means <- colMeans(param_data)
 
     if (!is.null(dim)) {
       return(array(param_means, dim = dim))
     }
     return(param_means)
   }
+
 
   monitored_params <- unique(sub("\\[.*", "", colnames(all_samples)))
   param_means_list <- lapply(monitored_params, function(param) {

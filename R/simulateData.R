@@ -88,12 +88,10 @@ simulateData_MNM<-function(S,R,T, prob, abundance){
   else if (prob=="all") p<-array(stats::runif(R*S, 0.01, 0.99), dim=c(R,S))
 
   # Mean and Covariance matrix for MVN variable a
-  set.seed(9875)
   Sigma<-clusterGeneration::genPositiveDefMat(S, rangeVar=c(0.2, 1), covMethod="unifcorrmat")[["Sigma"]]
   correlation<-stats::cov2cor(Sigma)
   mu<-rep(ifelse(abundance=="small", 2, 4),S)
 
-  set.seed(NULL)
   a<-mvtnorm::rmvnorm(R, mean=mu, sigma=Sigma)
   lambda<-exp(a)
 
@@ -138,11 +136,11 @@ simulateData_Hurdle <- function(S,R,T, prob, abundance, theta){
   mu<-rep(ifelse(abundance=="small", 2, 4),S)
 
 
-  set.seed(9875)
+
   Sigma <- clusterGeneration::genPositiveDefMat(S, rangeVar=c(0.2, 1), covMethod="unifcorrmat")[["Sigma"]]
   correlation <- stats::cov2cor(Sigma)
 
-  set.seed(NULL)
+
   a <- mvtnorm::rmvnorm(R, mean=mu, sigma=Sigma)
   lambda <- exp(a)
 
@@ -192,13 +190,11 @@ simulateData_AR<-function(S,R,T,K, prob, abundance){
   # Normally dist. autocorrelation coefficient
   muPhi<-0
   sigmaPhi<-0.2
-  set.seed(9875)
   phi<-stats::rnorm(S, muPhi, sigmaPhi)
 
 
   # MVN random effect
   Omega<-diag(1, nrow=S, ncol=S) # Scale matrix for wishart distribution
-  set.seed(9875)
   Sigma<-clusterGeneration::genPositiveDefMat(S, rangeVar=c(0.2, 1), covMethod="unifcorrmat")[["Sigma"]]
   correlation<-stats::cov2cor(Sigma)
   mu<-rep(ifelse(abundance=="small", 2, 4),S)
@@ -210,7 +206,6 @@ simulateData_AR<-function(S,R,T,K, prob, abundance){
   }
 
 
-  set.seed(NULL)
   a <- mvtnorm::rmvnorm(R, mean=mu, sigma=Sigma)
 
 
@@ -273,14 +268,12 @@ simulateData_Hurdle_AR<-function(S,R,T,K, prob, abundance, theta){
   # Uniform dist. autocorrelation coefficient
   muPhi<-0
   sigmaPhi<-0.2
-  set.seed(9875)
   phi<-stats::rnorm(S, muPhi, sigmaPhi)
 
 
   # MVN random effect
   Omega<-diag(1, nrow=S, ncol=S) # Scale matrix for wishart distribution
 
-  set.seed(9875)
   Sigma<-clusterGeneration::genPositiveDefMat(S, rangeVar=c(0.2, 1), covMethod="unifcorrmat")[["Sigma"]]
   correlation<-stats::cov2cor(Sigma)
   mu<-rep(ifelse(abundance=="small", 2, 4),S)
@@ -292,7 +285,6 @@ simulateData_Hurdle_AR<-function(S,R,T,K, prob, abundance, theta){
   }
 
 
-  set.seed(NULL)
   a <- mvtnorm::rmvnorm(R, mean=mu, sigma=Sigma)
 
 

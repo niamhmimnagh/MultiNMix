@@ -11,6 +11,7 @@ MNM_Hurdle(
   thin = 10,
   Xp = NULL,
   Xn = NULL,
+  verbose = TRUE,
   ...
 )
 }
@@ -41,6 +42,8 @@ MNM_Hurdle(
 \item \code{S}: Number of species.
 \item \code{P2}: Number of abundance covariates.
 }}
+
+\item{verbose}{Control the level of output displayed during function execution. Default is TRUE.}
 
 \item{...}{Additional arguments passed for prior distribution specification. Supported distributions include dnorm, dexp, dgamma, dbeta, dunif, dlnorm, dbern, dpois, dbinom, dcat, dmnorm, dwish, dchisq, dinvgamma, dt, dweib, ddirch, dmulti, dmvt. Default prior distributions are:
 \itemize{
@@ -82,10 +85,12 @@ Y <- array(rpois(100, lambda = 5), dim = c(10, 5, 2))
 Xp <- array(runif(100), dim = c(10, 2, 5))
 Xn <- array(runif(100), dim = c(10, 2, 3))
 
-\dontrun{model <- MNM_Hurdle(Y = Y, Xp = Xp, Xn = Xn)}
-
+\donttest{model <- MNM_Hurdle(Y = Y, Xp = Xp, Xn = Xn)}
+# nimble creates auxiliary functions that may be removed after model run is complete
+# str_objects <- ls(pattern = "^str")
+# rm(list = str_objects)
 # Accessing results
-\dontrun{print(model@summary)}
+\donttest{print(model@summary)}
 
 #' data(birds)
 
@@ -124,7 +129,7 @@ for (i in seq_len(nrow(birds))) {
 # Selecting only 5 bird species and 1 year for analysis:
 Y<-Y[,,1:5,1]
 
-\dontrun{model<-MNM_fit(Y=Y, AR=FALSE, Hurdle=TRUE, iterations=5000, burnin=1000)}
+\donttest{model<-MNM_fit(Y=Y, AR=FALSE, Hurdle=TRUE, iterations=5000, burnin=1000)}
 }
 \references{
 \itemize{

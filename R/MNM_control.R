@@ -252,16 +252,15 @@ MNM_control <- function(model = "MNM",
   precision[1:S,1:S] ~', prior_precision,'
   covariance[1:S,1:S]<-inverse(precision[1:S, 1:S])
 
+    # Correlations and standard deviations
+      for (s in 1:S) {
+        sigma[s] <- sqrt(covariance[s, s])
+        for (s1 in 1:S) {
+          correlation[s, s1] <- covariance[s, s1] / sqrt(covariance[s, s] * covariance[s1, s1])
+        }
+      }
 
 
- # Correlations and Standard deviations
-  for (s in 1:S){
-    sigma[s] <- sqrt(covariance[s,s])
-
-    for (s1 in 1:S){
-      cor[s,s1]<-covariance[s,s1]/sqrt(covariance[s,s]*covariance[s1, s1])
-    }
-  }
 
   theta~', prior_hurdle,'
   ', prob_beta, '
@@ -360,14 +359,13 @@ nimbleCode({
   precision[1:S,1:S] ~', prior_precision,'
   covariance[1:S,1:S]<-inverse(precision[1:S,1:S])
 
-
- # Correlations and Standard deviations
-  for (s in 1:S){
-    sigma[s] <- sqrt(covariance[s,s])
-    for (s1 in 1:S){
-      cor[s,s1]<-covariance[s,s1]/sqrt(covariance[s,s]*covariance[s1, s1])
-    }
-  }
+      # Correlations and standard deviations
+      for (s in 1:S) {
+        sigma[s] <- sqrt(covariance[s, s])
+        for (s1 in 1:S) {
+          correlation[s, s1] <- covariance[s, s1] / sqrt(covariance[s, s] * covariance[s1, s1])
+        }
+      }
 
 
   # Priors
@@ -477,14 +475,13 @@ nimbleCode({
   covariance[1:S,1:S]<-inverse(precision[1:S,1:S])
 
 
- # Correlations and Standard deviations
-  for (s in 1:S){
-    sigma[s] <- sqrt(covariance[s,s])
-
-    for (s1 in 1:S){
-      cor[s,s1]<-covariance[s,s1]/sqrt(covariance[s,s]*covariance[s1, s1])
-    }
-  }
+      # Correlations and standard deviations
+      for (s in 1:S) {
+        sigma[s] <- sqrt(covariance[s, s])
+        for (s1 in 1:S) {
+          correlation[s, s1] <- covariance[s, s1] / sqrt(covariance[s, s] * covariance[s1, s1])
+        }
+      }
 
   theta~', prior_hurdle,'
   ', prob_beta, '

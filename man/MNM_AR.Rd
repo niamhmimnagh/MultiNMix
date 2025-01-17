@@ -11,6 +11,7 @@ MNM_AR(
   thin = 10,
   Xp = NULL,
   Xn = NULL,
+  verbose = TRUE,
   ...
 )
 }
@@ -43,6 +44,8 @@ MNM_AR(
 \item \code{K}: Number of time points.
 \item \code{P2}: Number of abundance covariates.
 }}
+
+\item{verbose}{Control the level of output displayed during function execution. Default is TRUE.}
 
 \item{...}{Additional arguments passed for prior distribution specification. Supported distributions include dnorm, dexp, dgamma, dbeta, dunif, dlnorm, dbern, dpois, dbinom, dcat, dmnorm, dwish, dchisq, dinvgamma, dt, dweib, ddirch, dmulti, dmvt. Default prior distributions are:
 \itemize{
@@ -92,10 +95,12 @@ Xp <- array(runif(500), dim = c(10, 5, 2, 3))
 Xn <- array(runif(1000), dim = c(10, 5, 2, 4))
 
 # Fit the AR-1 model
-\dontrun{result <- MNM_AR(Y = Y, Xp = Xp, Xn = Xn)}
-
+\donttest{result <- MNM_AR(Y = Y, Xp = Xp, Xn = Xn)}
+# nimble creates auxiliary functions that may be removed after model run is complete
+# str_objects <- ls(pattern = "^str")
+# rm(list = str_objects)
 # Check fitted vs observed abundance
-\dontrun{plot(result@data, result@fitted_Y)}
+\donttest{plot(result@data, result@fitted_Y)}
 
 #' data(birds)
 
@@ -134,7 +139,7 @@ for (i in seq_len(nrow(birds))) {
 # Selecting only 5 bird species  for analysis:
 Y<-Y[,,1:5,]
 
-\dontrun{model<-MNM_fit(Y=Y, AR=TRUE, Hurdle=FALSE, iterations=10000, burnin=2000)}
+\donttest{model<-MNM_fit(Y=Y, AR=TRUE, Hurdle=FALSE, iterations=10000, burnin=2000)}
 
 }
 \references{
