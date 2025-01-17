@@ -121,14 +121,27 @@ MNM <- function(Y = NULL, iterations = 60000, burnin = 20000, thin = 10, Xp = NU
                         verbose=FALSE,
                         clearNimbleFunctionsAfterCompiling=TRUE,
                         clearCompiled=TRUE)
-  # Check inputs
-  if (is.null(Y)) stop("Error: No data entered. Please provide Y: an array of dimension (R,T,S).")
-  if (!all(is.numeric(as.vector(Y)))) stop("Error: Non-numeric elements present in Y. Please confirm that Y contains only counts.")
+  if(is.null(Y)){
+    stop("Error: No data entered. Please provide Y: an array of dimension (R,T,S).")
+  }
 
-  R <- dim(Y)[1]
-  T <- dim(Y)[2]
-  S <- dim(Y)[3]
+  if(!all(is.numeric(as.vector(Y)))){
+    stop("Error: Non-numeric elements present in Y. Please confirm that Y contains only observational counts.")
+  }
 
+  R=dim(Y)[1]
+  T=dim(Y)[2]
+  S=dim(Y)[3]
+
+  print(paste0("Observations entered correspond to ", R, " sites, ", T, " sampling occasions, and ", S, " species. If this appears to be incorrect, please re-format your data into an array of dimension (R,T,S)."))
+
+  if(burnin>iterations){
+    stop("The number of iterations discarded as burn-in cannot be greater than the total number of iterations.")
+  }
+
+  if(iterations<5000){
+    print(paste0("Warning: Using too few iterations may result in a model that fails to converge."))
+  }
 
   # Capture additional arguments
   additional_args <- list(...)
