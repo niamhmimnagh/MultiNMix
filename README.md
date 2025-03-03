@@ -25,14 +25,12 @@ devtools::install_github("niamhmimnagh/MultiNMix")
 Here is a quick example to get you started with `MultiNMix`:
 
 ```R
-library(MultinMix)
+library(MultiNMix)
 
 # Example data
 x <- simulateData(model = "MNM")
  R<-x$R
  T<-x$T
- S<-x$S
- K<-x$K
 
  Xp <- array(rnorm(R * S * 2), dim = c(R,  S, 2)) # creating 2 detection probability covariates
  Xn <- array(rnorm(R * S *3), dim = c(R, S,  3)) # creating 3 abundance covariates
